@@ -56,7 +56,7 @@ def targeted_weight_dropout(weight, dropout_rate, targeted_portion, is_training)
     threshold = torch.sort(norm, dim=0)[0][idx]
     mask = norm < threshold[None, :]
 
-    if is_training:
+    if not is_training:
         mask = (torch.rand(weight.shape) < dropout_rate).to(mask.device.type) & mask
 
     weight = (1.0 - mask.float()) * weight
@@ -77,7 +77,7 @@ def targeted_unit_dropout(weight, dropout_rate, targeted_portion, is_training):
     mask = (norm < threshold)[None, :]
     mask = mask.repeat(weight.shape[0], 1)
 
-    if is_training:
+    if not is_training:
         mask = torch.where(
             ((1.0 - dropout_rate) < torch.rand(weight.shape)).to(mask.device.type)
             & mask,
